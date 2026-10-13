@@ -2,9 +2,6 @@ name: Render Shorts
 
 on:
   workflow_dispatch:
-  # Keep rendering manual until storage, licensing, and quality checks are configured.
-  # schedule:
-  #   - cron: "0 15 * * 6"
 
 permissions:
   contents: read
@@ -16,19 +13,20 @@ concurrency:
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
-      - name: Install FFmpeg
+      - name: Install FFmpeg and Python dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
-
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Generate transcript-based clip candidates
+        run: python3 src/find_short_candidates.py --source episodes/current/source.mp4 --output episodes/current/auto_clips.json
       - name: Render vertical clips
-        run: python3 src/make_shorts.py
-
+        run: python3 src/make_shorts.py --source episodes/current/source.mp4 --plan episodes/current/auto_clips.json
       - name: Upload rendered clips and metadata
         uses: actions/upload-artifact@v4
         with:
