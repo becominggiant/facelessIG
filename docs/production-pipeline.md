@@ -1,44 +1,30 @@
 # Becoming Giant Studio — Shorts renderer
 
-This is the first production stage for the Becoming Giant content pipeline. It renders planned moments from a finished master video into vertical 9:16 clips using FFmpeg, then packages the MP4s and metadata as a GitHub Actions artifact.
+This repository now contains the first stages of a cloud Shorts pipeline.
 
-## Current status
+## Implemented
 
-- Implemented: cloud-rendered vertical clips from a source MP4 and a JSON clip plan.
-- Not yet implemented: automatic topic research, AI script generation, voice synthesis, visual asset acquisition, speech-aware moment selection, and direct Rumble upload.
-- Publishing: use Rumble's supported interface until an official supported upload route is verified. Do not put a Rumble password or session cookie in this repository.
+- A speech-to-text candidate finder using faster-whisper. It proposes non-overlapping moments from a master video.
+- An FFmpeg renderer that center-crops selected moments to 1080×1920 vertical MP4.
+- A GitHub Actions workflow that runs candidate detection, renders clips, and packages the output as a short-lived artifact.
 
-## Run a test
+## Important limitations
 
-1. Put a source video at `episodes/current/source.mp4`.
-2. Edit `episodes/current/clips.json` with the clip start/end times and titles. Keep clips within the source video's duration.
-3. Open **Actions → Render Shorts → Run workflow**.
-4. Download the `becoming-giant-shorts` artifact from the completed run.
+The candidate finder is a first pass, not an editor: inspect clips for context, accurate cuts, and useful standalone meaning. Captions, smart reframing, full episode creation, automated research/script/narration, and direct Rumble upload are not yet implemented. Use Rumble's supported interface until an official supported upload route is verified; never store a Rumble password or session cookie in this repository.
 
-The repository is currently public. **Do not commit API keys, passwords, private footage, or copyrighted assets you do not have permission to use.** Keep source videos out of Git history; for production, connect private object storage or a permitted media source.
+## Run it
 
-## Clip plan format
+The workflow expects a source video at `episodes/current/source.mp4`. Because this repository is public, do not commit private footage or large media files. Before unattended cloud runs, we must connect access-controlled media storage and retrieve the source safely. Avoid putting signed private URLs in workflow inputs or logs.
 
-```json
+For local testing, install FFmpeg and run `pip install -r requirements.txt`, then `python3 src/find_short_candidates.py`, followed by `python3 src/make_shorts.py --plan episodes/current/auto_clips.json`.
 
-{
-  "episode_title": "The Convergence: AI, Biology & the Future of Humanity",
-  "clips": [
-    {
-      "start": 12.0,
-      "end": 48.0,
-      "title": "Are We Becoming Digital Biology?",
-      "description": "A short excerpt exploring the convergence of AI and biology."
-    }
-  ]
-}
-```
+## Rights and review
 
-Times are seconds. Aim for 20–60 seconds per clip initially. The renderer center-crops to 9:16; footage with important information near the edges may need a future smart-reframe stage.
+Only use footage, images, music, and audio you created or have permission to use. Generated clip titles are drafts and should be reviewed before publishing.
 
 ## Next stages
 
-1. Add speech-to-text and transcript-based candidate detection.
-2. Add optional AI ranking for hooks, completeness, and factual/rights checks.
-3. Add licensed visual sourcing, narration, and long-form assembly.
-4. Add a publishing adapter only after confirming the platform's supported upload method.
+1. Connect access-controlled media storage.
+2. Add animated captions and smart reframing.
+3. Add long-form assembly, narration, licensed visuals, and episode metadata.
+4. Add an upload adapter only after verifying a supported publishing method.
