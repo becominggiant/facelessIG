@@ -78,3 +78,7 @@ python3 src/make_shorts.py --source episodes/current/source.mp4 --plan episodes/
 
 - Prompt work: [prompt-engineering-portfolio](https://github.com/becominggiant/prompt-engineering-portfolio)
 - Agents: [agentfi-executor](https://github.com/becominggiant/agentfi-executor)
+
+## License
+
+MIT — see [LICENSE](LICENSE).
